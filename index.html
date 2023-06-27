@@ -1,276 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción al taller de emuladores</title>
 
-		<title>Desarrollando un emulador de CHIP-8</title>
-
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/blood.min.css" id="theme">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/base16/monokai.min.css">
-		<style>
-			.reveal h1 { font-size: 2.2em; text-transform: none; }
-			.reveal h2 { font-size: 1.8em; text-transform: none; }
-			.reveal h3 { font-size: 1.3em; }
-			.reveal h4 { font-size: 0.8em; }
-			.reveal p { font-size: 0.8em; }
-			.reveal small { font-size: 0.6em; color:#808080; }
-			.reveal a { color:rgb(194, 39, 39); }
-			.reveal li { font-size: 0.8em; }
-			.reveal span { font-size: 1em; }
-		</style>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>
-					<h1>Intro a emuladores: Desarrollando un emulador de CHIP-8</h1>
-					<span>Gonzalo Avila · <tt>gzalo.com</tt></span>
-				</section>
-
-				<section>
-					<section>
-					<h2>Antes de empezar</h2>
-					<p>Gracias por venir, vamos a estar ~5 horas programando (menos de 500 líneas)</p>
-					<p>Si algo no funciona bien o no se entiende, no duden en preguntar!</p>
-					<p>Si quieren seguir la presentación desde sus compus, está en emuladores.gzalo.com</p>
-					<small>Creative Commons Attribution-NonCommercial 4.0 International License</small>
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Manipulación de bits</h2>
-						<ul>
-							
-						</ul>
-					</section>
-
-					<section>
-						<h2>Operaciones básicas</h2>
-
-						& AND
-						| OR
-						^ XOR
-						~ NOT
-
-						&lt;&lt; Left shift
-						&rt;&rt; Right shift
-					</section>
-					
-					<section>
-						<h2>Binario </h2>
-
-						128 64 32 16 8 4 2 1
-					</section>
-
-					<section>
-						<h2>Encender un bit</h2>
-						Crear una máscara que tenga 0 en todos los lugares excepto uno
-						usar OR
-						
-					</section>
-
-					<section>
-						<h2>Apagar un bit</h2>
-						Crear una máscar que tenga 1 en todos los lugares excepto uno
-						usar AND
-						
-					</section>
-
-					<section>
-						<h2>Cambiar el estado un bit</h2>
-						AKA _togglear_
-						Crear una máscara que tenga 0 en todos los lugares excepto uno
-						usar XOR
-						
-					</section>
-
-					<section>
-						<h2>Revisar el estado un bit</h2>
-						Crear una máscara que tenga 1 en un solo lugar
-						usar AND
-						Si el resultado es 0, el bit NO estaba setteado
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Arquitectura CHIP-8</h2>
-
-						8 Bits
-
-						Memoria: 4096 lugares, cada uno un byte (8 bits). Direcciones 0x0000-0x0FFF en hexa
-						los primeros 512 posiciones tenian el bootloader por lo que la mayoría de los programas no lo usa.
-						Los 256 byes más altos se reservaban para variables internas, tipografía de 3x5 y otras cosas, no lo vamos a usar 
-						No vamos a usar esos bytes así que podemos empezar declarando un array de 4096 posiciones para la memoria
-
-						Registros:
-						Lugares donde se guardan datos internamente, las operaciones los usan. 16 registros de 8 bits V0 a VF
-						Muchas operaciones indexan los registros así que les recomiendo hacer que sea un array de 16 valores, así no tienen que llenar todo de ifs.
-
-						VF Carry flag (en resta es "no pide prestado")
-						En dibugo Vf se settea al cambiar pixeles de 1 a 0
-
-						address register, I, 12 bits, usado en varias operaciones relacionadas con la memoria
-
-						program counter, PC arranca en 0x200
-
-						Stack:
-						Podemos usar la misma memoria que usaba la original (48 bytes -> 24 niveles de stack).
-						Debemos usar un stack pointer, que puede ser de 8 bits.
-
-						Timers:
-						Contadores que bajan cada 1/60 de segundo, hasta que llegan a 0, luego quedan ahí
-						- Delay (se puede leer y escribir el valor)
-						- Sonido: usado para efectos (cuando no es cero suena)
-
-						Gráficos:
-						64x32 monocromáticos
-
-						Entradas:
-						Hex keyboard. 8 4 6 2 usados como flechitas. 
-						
-					</section>
-				</section>
-			
-				<section>
-					<section>
-						<h2>Game loop</h2>
-
-						while (!fin) {
-							manejarEventos();
-							avanzarEmulacion();
-							dibujarPantalla();
-							esperar(16ms);
-						}
-						
-						avanzarEmulacion debería correr aprox 500 veces por segundo. Como estamos a 60 fps (con suerte), podemos correr 8 veces avanzarEmulacion por frame y deberíamos estar más cerca.
-
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Eventos</h2>
-
-						La biblioteca que estén usando debería proveer de una forma de detectar eventos.
-						Los eventos de teclado suelen ser detectados una única vez (una cuando se presiona, una cuando se suelta)
-						por lo que necesitamos convertirlos en variables booleanas (o un array o bitset, lo que prefieran)
-						
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Gráficos</h2>
-
-						Para dibujar en la pantalla se usan sprites de 8 pixeles de ancho, y entre 1 y 15 de alto.
-						El dibujo se hace con un XOR del valor actual de la pantalla y el sprite.
-						Si algun pixel pasa de estar dibujado a no estar dibujado, se settea el VF a 1, si no se settea a 0.
-
-						Por lo general en las bibliotecas gráficas tenemos una función tipo "setPixel(x,y,value)" y "getPixel(x,y)" o si no, acceso a alguna
-						parte de la memoria que esté mappeada a una superficie gráfica.
-
-						Recuerden que los gráficos suelen ser 24 o 32 bits, por lo que blanco suele ser 0xFFFFFFFF y negro 0xFF000000. El byte más alto es transparencia, luego RGB o BGR depende de la implementación.
-						
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Carga de archivos</h2>
-						
-						Para cargar las roms con los distintos juegos, debemos cargar un archivo binario y leer cada byte e ir metiéndolo en la memoria (desde 0x200).
-						Podemos intentar leer el tamaño completo y si falla no hacer nada malo.
-
-						FILE *input = fopen(game, "rb");
-						fread( &mGame[0x200], 0xE00, 1, input);
-						fclose(input);
-
-						(recuerden que PC arranca en 0x0200, se supone que los primeros 512 bytes eran parte de rutinas de la máquina original)
-
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Opcodes</h2>
-
-						Fetch: 
-						opcode = (mGame[mRegPC]&lt;&lt;8) | (mGame[mRegPC+1]);
-						mRegPC+=2;
-						
-						0NNN -> ignore (llamadas a funciones de la máquina original)
-						00E0 -> borrar pantalla
-						00EE -> return -> PC = pop();
-						1NNN -> jmp NNN -> PC = NNN;
-						2NNN -> call NNN -> push(PC); PC = NNN;
-						3XNN -> if(Vx == NN) PC += 2; // 	Skips the next instruction if VX equals NN
-						4XNN -> if(Vx != NN) PC += 2; // 	Skips the next instruction if VX does not equal NN
-						5XY0 -> if(Vx == Vy) PC += 2; // 	Skips the next instruction if VX equals VY
-						6XNN -> Vx = NN;
-						7XNN -> Vx += NN;  (carry no afecta VF)
-						8XY0 -> Vx = Vy; 
-						8XY1 -> Vx = Vx | Vy;
-						8XY2 -> Vx = Vx & Vy;
-						8XY3 -> Vx = Vx ^ Vy;
-						8XY4 -> Vx = Vx + Vy; VF = 1 si hubo carry
-						8XY5 -> Vx = Vx - Vy; VF = 1 si hubo borrow mRegs[0xF] = 1 if(Vx >= Vy) else 0;
-						8XY6 -> Vx = Vx >> 1;
-						8XY7 -> Vx = Vy - Vx; VF = 1 si hubo borrow mRegs[0xF] = 1 if(Vy >= Vx) else 0;
-						8XYE -> Vx = Vx << 1; Vf es el bit que desapareció (Vx >> 7)
-						9XY0 -> if(Vx != Vy) PC += 2; // 	Skips the next instruction if VX does not equal VY
-						ANNN -> I = NNN
-						BNNN -> PC = V0 + NNN
-						CXNN -> Vx = rand() & NN
-						DXYN -> draw(Vx, Vy, N), dibuja un sprite en Vx, Vy, de 8 de ancho y N de alto. Cada fila de 8 pixeles se lee a partir de I. No cambia el valor de I pero sí el de VF si se apaga algún pixel
-						EX9E -> if(isDown(Vx)) PC += 2 // Skips the next instruction if the key stored in VX is pressed 
-						EXA1 -> if(!isDown(Vx)) PC += 2 // Skips the next instruction if the key stored in VX is not pressed 
-						FX07 -> Vx = getDelayTimerValue();
-						FX0A -> if(noKeyDown) PC -= 2; Vx = getKeyDown();
-						FX15 -> setDelayTimerValue(Vx);
-						FX18 -> setSoundTimerValue(Vx);
-						FX1E -> I = I + Vx (no afecta VF)
-						FX29 -> I = font[Vx] (fuente de 4x5)
-						FX33 -> mem[I] = Vx/100; mem[I+1] = (Vx/10)%10; mem[I+2] = Vx%10; convierte a BCD extrayendo cada dígito a un byte
-						FX55 -> for(i=0;i<=x;i++) mem[i+I] = Vi;
-						FX65 -> for(i=0;i<=x;i++) Vi = mem[i+I];
-
-						push : mStack[mRegSP++] = X;
-						pop : X = mStack[--mRegSP];
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>ROMS</h2>
-						
-						<p>Hay muchos juegos y ROMs que ayudan a ver si están funcionando bien los opcodes:</p>
-
-						<ul>
-						<li><a href="https://github.com/corax89/chip8-test-rom">chip8-test-rom</a></li>
-						<li><strong><a href="https://github.com/Timendus/chip8-test-suite">chip8-test-suite</a></strong></li>
-						<li>Juegos cc0: https://johnearnest.github.io/chip8Archive/</li>
-						<li>Roms de todo un poco: https://github.com/kripod/chip8-roms</li>
-						</ul>
-					</section>
-				</section>
-			</div>
-		</div>
-
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/markdown/markdown.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/notes/notes.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/highlight/highlight.min.js"></script>
-		<script>
-			Reveal.initialize({
-				hash: true,
-				slideNumber: true,
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
-				navigationMode: 'linear'
-			});
-		</script>
-	</body>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.1.6/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="hero min-h-screen bg-base-200">
+        <div class="hero-content text-center">
+            <div class="max-w-lg">
+                <h2 class="text-4xl font-bold">Taller de emuladores</h2>
+                <h1 class="text-5xl font-bold">Desarrollo de un emulador de CHIP-8</h1>
+                <p class="py-6 text-2xl">Sábado 22 de Julio a las 15 hs en el RLab</p>
+                
+                <form hx-post="/inscribir">
+                    <p class="pt-2 font-bold">Inscribite acá:</p>
+                    <input type="text" name="name" placeholder="Nombre/Nick" class="input w-full max-w-lg my-2" required maxlength="128"/>
+                    <input type="text" name="email" placeholder="Email o usuario de Telegram (opcional)" class="input w-full max-w-lg my-2" maxlength="128"/>
+                    <input type="text" name="lang" placeholder="Lenguaje de programación" class="input w-full max-w-lg mt-2 mb-3" required maxlength="128"/>
+                    <button class="btn btn-primary">Inscribirme</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
