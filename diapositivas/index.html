@@ -32,28 +32,25 @@
 				<section>
 					<section>
 					<h2>Antes de empezar</h2>
-					<p>¡Gracias por venir! Vamos a estar ~5 horas programando.</p>
-					<p>Si algo no funciona bien o no se entiende, no duden en preguntar.</p>
+					<p>¡Gracias por venir! Vamos a estar ~5 horas programando</p>
+					<p>Si algo no funciona bien o no se entiende, no duden en preguntar</p>
 					<p>Presentación en: <tt>emuladores.gzalo.com/diapositivas</tt></p>
-					<small>Creative Commons Attribution-NonCommercial 4.0 International License</small>
+					<small>Licencia: Creative Commons Attribution-NonCommercial 4.0 International License</small>
 					</section>
 				</section>
 
 				<section>
 					<section>
 						<h2>Manipulación de bits</h2>
-						<p>Para varias partes necesitaremos trabajar a nivel de bits</p>
+						<p>En varios lugares necesitaremos trabajar a nivel de bits</p>
+						<p class="fragment">Las variables numéricas se pueden pensar como una lista de bits
+							<img src="img/bits.png">
+						</p>
+						
 					</section>
 
 					<section>
-						<h2>Binario </h2>
-
-						Cada valor de una variable está compuesto de	 bits:<br>
-						<img src="img/bits.png">
-					</section>
-
-					<section>
-						<h2>Operaciones básicas</h2>
+						<h2>Operaciones de bits</h2>
 						<p>Aplican bit a bit (<em>bitwise</em>), no confundir con operaciones lógicas:</p>
 						<ul>
 							<li class="fragment">A&B (AND): 1 si ambos son 1 </li>
@@ -69,7 +66,7 @@
 						<h2>Encender un bit</h2>
 						<p>Máscara con 0s en todos los lugares excepto uno (o más), usar OR:</p>
 						<img src="img/bits_or.png">
-						<p><code>a = a | 0x08</code></p>
+						<p class="fragment"><code>a = a | 0x08</code></p>
 						<p class="fragment"><code>a = a | (1&lt;&lt;3)</code></p>
 					</section>
 
@@ -77,7 +74,7 @@
 						<h2>Apagar un bit</h2>
 						<p>Máscara con 1s en todos los lugares excepto uno (o más), usar AND:</p>
 						<img src="img/bits_and.png">
-						<p><code>a = a & 0xDF</code></p>
+						<p class="fragment"><code>a = a & 0xDF</code></p>
 						<p class="fragment"><code>a = a & ~(1&lt;&lt;5)</code></p>
 					</section>
 
@@ -85,7 +82,7 @@
 						<h2>Cambiar el estado un bit (<em>togglear</em>)</h2>
 						<p>Máscara con 0s en todos los lugares excepto uno (o más), usar XOR:</p>
 						<img src="img/bits_xor.png">
-						<p><code>a = a ^ 0x10</code></p>
+						<p class="fragment"><code>a = a ^ 0x10</code></p>
 						<p class="fragment"><code>a = a ^ (1&lt;&lt;4)</code></p>
 					</section>
 
@@ -93,7 +90,7 @@
 						<h2>Revisar el estado un bit</h2>
 						<p>Máscara que tenga 1 en un solo lugar, usar AND: <br>Si el resultado es distinto de 0, el bit estaba setteado</p>
 						<img src="img/bits_test.png">
-						<p><code>if ((a & 0x40) != 0) ...</code></p>
+						<p class="fragment"><code>if ((a & 0x40) != 0) ...</code></p>
 						<p class="fragment"><code>if ((a & (1&lt;&lt;6)) != 0) ...</code></p>
 					</section>
 				</section>
@@ -101,22 +98,24 @@
 				<section>
 					<section>
 						<h2>Arquitectura CHIP-8</h2>
-						<p>8 bits, Von Neumann</p>
-						<p>Creada por Joseph Weisbecker a fines de los 70</p>
-						<p>No fue originalmente creada en hardware, empezó como un interprete para la computadora COSMAC VIP</p>
+						<p class="fragment">8 bits, Von Neumann. Creada por Joseph Weisbecker en 1977</p>
+						<p class="fragment">Empezó como un interprete para la computadora COSMAC VIP</p>
 
-						<img src="img/bloques.png">
+						<img src="img/bloques.png" class="fragment">
 					</section>
 
 					<section>
 						<h2>Memoria</h2>
 
 						<ul>
-							<li>4096 lugares, cada uno un byte (8 bits). Direcciones 0x0000-0x0FFF en hexadecimal</li>
-							<li>Los primeros 512 bytes tenían el bootloader, la mayoría de los programas no lo usa</li>
-							<li>Los 256 bytes más altos se reservaban para variables internas, una tipografía de 3x5 entre otras</li>
-							<li>No vamos a usar esos bytes así que podemos empezar declarando un array de 4096 posiciones para la memoria:
-							<pre><code class="language-c">uint8_t memory[0x1000];</code></pre></li>
+							<li class="fragment">4096 posiciones de un byte (8 bits)<br>Direcciones <code>0x0000-0x0FFF</code></li>
+							<li class="fragment">Toda la memoria es RAM y es lectura/escritura</li>
+							<li class="fragment">Regiones reservadas:
+							<ul>
+								<li>Los primeros 512 bytes tenían el bootloader</li>
+								<li>Los últimos 256 bytes se usaban para variables internas</li>
+							</ul></li>
+							<pre class="fragment"><code class="language-c">uint8_t memory[0x1000];</code></pre></li>
 						</ul>
 
 					</section>
@@ -125,14 +124,15 @@
 						<h2>Registros</h2>
 
 						<ul>
-							<li>Son lugares donde se guardan datos internamente, se usan por distintas operaciones</li>
-							<li><strong>V0 a VF</strong>: 16 registros de 8 bits</li>
-							<li><strong>VF</strong> se usa como <em>Carry flag</em>: 1 si hubo <em>carry</em> o no <em>borrow</em> y en algunas operaciones gráficas</li>
-							<li><strong>I</strong> Address register 12 bits, usado en varias operaciones relacionadas con la memoria</li>
-							<li><strong>PC</strong> Program Counter, se leen las instrucciones desde allí y se va incrementando. Empieza en 0x200 (donde se cargan los programas)</li>	
-								<pre><code class="language-c">uint8_t v[16];
+							<li class="fragment">Son lugares donde se guardan datos internamente, se usan por distintas operaciones</li>
+							<li class="fragment"><strong>V0 a VF</strong>: 16 registros de 8 bits
+								<ul><li class="fragment"><strong>VF</strong> se usa como <em>Carry flag</em>: 1 si hubo <em>carry</em> o no <em>borrow</em> y en algunas operaciones gráficas</li></ul>
+							</li>
+							<li class="fragment"><strong>I</strong> Index register, 12 bits, usado en varias operaciones relacionadas con la memoria</li>
+							<li class="fragment"><strong>PC</strong> Program Counter, 12 bits, apunta a la posición desde la cual se leen las instrucciones. Empieza en 0x200 (donde se cargan los programas) y se va incrementando</li>	
+								<pre class="fragment"><code class="language-c">uint8_t v[16];
 uint16_t pc = 0x200;
-uint16_t address = 0x0000;</code></pre>
+uint16_t index = 0x0000;</code></pre>
 						</ul>
 					</section>
 
@@ -140,34 +140,49 @@ uint16_t address = 0x0000;</code></pre>
 						<h2>Stack</h2>
 
 						<ul>
-							<li>En el mismo se guardan las direcciones de retorno (próximo valor de PC) al llamar a una subrutina.</li>
-							<li>Al menos 24 niveles de stack. Podemos usar el mismo espacio de memoria que usaba el intérprete original</li>
-							<li>Debemos usar un stack pointer, que puede ser de 8 bits. El mismo contiene el índice donde se almacenarán los próximos elementos a pushear</li>
-							<pre><code class="language-c">uint16_t stack[24];
+							<li class="fragment">En el mismo se guardan las direcciones de retorno (próximo valor de PC) al llamar a una subrutina</li>
+							<li class="fragment">Debemos soportar al menos 24 niveles de stack. No es necesario usar el espacio de memoria reservado</li>
+							<li class="fragment">Con un stack pointer que puede ser de 8 bits podemos seguir el índice donde se almacenarán los elementos a pushear</li>
+							<pre class="fragment"><code class="language-c">uint16_t stack[24];
 uint8_t stackPointer = 0;</code></pre>
+<pre class="fragment"><code class="language-c">void push(uint16_t valor){
+	stack[stackPointer++] = valor;
+}
+uint16_t pop(){
+	return stack[--stackPointer];
+}
+</code></pre>
 						</ul>
 					</section>
 
 					<section>
 						<h2>Timers</h2>
 						<ul>
-							<li>Son contadores de 8 bits que se decrementan cada 1/60 de segundo. Cuando llegan a 0 quedan ahí, no se reinician solos:
+							<li class="fragment">Son contadores de 8 bits que se decrementan cada 1/60 de segundo. Cuando llegan a 0 quedan ahí, no se reinician solos:
 								<ul>
-									<li>Delay: se puede leer y escribir el valor</li>
-									<li>Sonido: solo escritura, cuando no vale cero debería sonar un tono</li>
+									<li class="fragment">Delay: se puede leer y escribir el valor</li>
+									<li class="fragment">Sonido: solo escritura. Hacer sonar un tono cuando no vale cero</li>
 								</ul>
 							</li>
-							<pre><code class="language-c">uint8_t delayTimer = 0;
-uint8_t soundTimer = 0;</code></pre>
+							<pre class="fragment"><code class="language-c">uint8_t delayTimer = 0;
+uint8_t soundTimer = 0;
+</code></pre>
 						</ul>
 					</section>
 
 					<section>
 						<h2>Gráficos</h2>
 						<ul>
-						<li>64x32 monocromáticos</li>
-						<li>No tienen mucho misterio, solo un comportamiento de readback al dibujar sprites. Podemos usar un framebuffer o escribir directo en pantalla (si tenemos un mecanismo para leer pixeles) </li>
-						<pre><code class="language-c">uint8_t screen[64*32];</code></pre>
+						<li class="fragment">64x32 monocromáticos</li>
+						<li class="fragment">La operación de dibujar sprites permite detectar colisiones</li>
+						<li class="fragment">Podemos usar un framebuffer o escribir directo en pantalla, siempre que tengamos un mecanismo para leer pixeles</li>
+						<pre class="fragment"><code class="language-c">uint8_t screen[64*32];</code></pre>
+						<pre class="fragment"><code class="language-c">void setPixel(uint8_t x, uint8_t y, uint8_t value) { 
+	screen[ y * 64 + x ] = value; 
+}
+uint8_t getPixel(uint8_t x, uint8_t y) { 
+	return screen[ y * 64 + x ]; 
+}</code></pre>
 						</ul>
 					</section>
 
@@ -175,12 +190,18 @@ uint8_t soundTimer = 0;</code></pre>
 					<section>
 						<h2>Teclado</h2>
 						<ul>
-						<li>Tiene 16 teclas, de 0 a F. Por lo general el 8 4 6 2 son usados como flechas.</li>
-						<li>Se pueden mappear al teclado numérico:
+						<li class="fragment">Tiene 16 teclas (<code>0 a F</code>)<br> Por lo general las teclas 8, 4, 6 y 2 son usados como flechas</li>
+						<li class="fragment">Se pueden mappear a botones del teclado:
 						<code><pre>1	2	3	C
 4	5	6	D
 7	8	9	E
 A	0	B	F</pre></code>
+
+<code><pre>
+1	2	3	4
+Q	W	E	R
+A	S	D	F
+Z	X	C	V</pre></code>
 					</li>
 						</ul>
 					</section>
@@ -191,7 +212,7 @@ A	0	B	F</pre></code>
 					<section>
 						<h2>Game loop</h2>
 
-						<pre><code class="language-c">cargarRom();
+						<pre class="fragment"><code class="language-c">cargarRom();
 while (!fin) {
 	manejarEventos();
 	if(delayTimer > 0) delayTimer--;
@@ -201,9 +222,9 @@ while (!fin) {
 	esperar(16 ms);
 }</code></pre>
 						<ul>
-						<li><code>avanzarEmulacion</code> debería correr ~500 veces por segundo. Asumiendo video a 60 fps, podemos correrlo 8 veces por frame y debería ser similar.</li>
-						<li>En otros emuladores más precisos se cuenta el delay por instrucción (en CHIP-8 no importa)</li>
-						<li>Siempre corriendo, pero se podrían agregar estados (running, paused, halted, ...) que ayuden a debuggear</li>
+						<li class="fragment"><code>avanzarEmulacion</code> debería correr ~500 veces por segundo. Asumiendo 60 fps, podemos correrlo 8 veces por frame como una aproximación</li>
+						<li class="fragment">En otros emuladores más precisos se cuenta el delay por instrucción (en CHIP-8 no importa tanto)</li>
+						<li class="fragment">Se podrían agregar un modo <em>pausa</em> para ayudar al debugging</li>
 						</ul>
 					</section>
 				</section>
@@ -212,8 +233,8 @@ while (!fin) {
 					<section>
 						<h2>Funcionalmente</h2>
 						<img src="img/funcional.png">
-						<p>No recomendado por ahora pero es posible</p>
-						<p><code>Estado<sub>t+1</sub> = f(Estado<sub>t</sub>)</code></p>
+						<p class="fragment"><code>Estado<sub>t+1</sub> = f(Estado<sub>t</sub>)</code></p>
+						<p class="fragment">No recomentable para emuladores más complejos, ya que usa bastante memoria y procesamiento para calcular el nuevo estado</p>
 					</section>
 				</section>
 
@@ -222,10 +243,10 @@ while (!fin) {
 						<h2>Eventos</h2>
 
 						<ul>
-						<li>La biblioteca que estén usando debería proveer de una forma de detectar eventos (teclado, cierre de ventana, ...).</li>
-						<li>Los de teclado suelen ser detectados una única vez: una cuando se presiona, una cuando se suelta.</li>
-						<li>Necesitamos convertirlos en variables booleanas/array/bitset, cómo prefieran:</li>
-						<pre><code class="language-c">uint8_t keys[16];</code></pre>
+						<li class="fragment">La biblioteca gráfica que estén usando debería proveer formas de detectar eventos (teclado, cierre de ventana, ...)</li>
+						<li class="fragment">Los de teclado suelen ser detectados una única vez: una cuando se presiona, una cuando se suelta</li>
+						<li class="fragment">Necesitamos convertirlos en variables booleanas, por ejemplo:</li>
+						<pre class="fragment"><code class="language-c">uint8_t keys[16];</code></pre>
 						</ul>
 						
 					</section>
@@ -235,27 +256,28 @@ while (!fin) {
 					<section>
 						<h2>Gráficos</h2>
 						<ul>
-							<li>Para dibujar en la pantalla se usan sprites de 8 pixeles de ancho, y entre 1 y 15 de alto.</li>
-							<li>Se hace con un XOR del valor actual de la pantalla y el sprite.</li>
-							<li>Si algun pixel pasa de estar "prendido" (blanco) a estar "apagado" (negro), se settea VF a 1, si no se settea a 0.</li>
-							<li>No hay sincronización con el renderizado de un frame, es normal que parpadeen.</li>
+							<li class="fragment">Para dibujar en la pantalla se usan sprites de 8 pixeles de ancho, y entre 1 y 15 de alto</li>
+							<li class="fragment">Se hace con un XOR del valor actual de la pantalla y el sprite</li>
+							<li class="fragment">Si algun pixel pasa de estar "prendido" (blanco) a estar "apagado" (negro), se settea VF a 1, si no se settea a 0</li>
+							<li class="fragment">No hay sincronización con el renderizado de un frame, es normal que parpadeen</li>
 						</ul>
 					</section>
 
 					<section>
 						<h2>Emulando gráficos</h2>
 						<ul>
-							<li>Tenemos una función tipo <code>setPixel(x,y,value)</code> y <code>getPixel(x,y)</code> o si no, acceso a memoria de video.</li>
-							<li>Suelen ser 24 o 32 bits: <code>blanco = 0xFFFFFFFF</code> y <code>negro = 0xFF000000</code>.</li>
-							<li>Como es muy pequeña la pantalla, recomiendo que usen un factor de escala y dibujen cada píxel más de una vez (un cuadrado de NxN)</li>
+							<li class="fragment">Em las bibliotecas tenemos una función tipo <code>setPixel(x,y,value)</code> y <code>getPixel(x,y)</code> o si no, acceso a memoria de video</li>
+							<li class="fragment">Suelen ser 24 o 32 bits: <code>blanco = 0xFFFFFFFF</code><br><code>negro = 0xFF000000</code></li>
+							<li class="fragment">Como la pantalla es chica, recomiendo que usen un factor de escala y dibujen cada píxel como un cuadrado de NxN</li>
 						</ul>
 					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2>Fuente 3x5</h2>
-						<pre><code class="language-c">uint8_t font[80] = {
+						<h2>Tipografía 3x5</h2>
+						<p class="fragment">Se usa para mostrar puntajes y otros números</p>
+						<pre class="fragment"><code class="language-c">uint8_t font[80] = {
 	0x60, 0xa0, 0xa0, 0xa0, 0xc0,
 	0x40, 0xc0, 0x40, 0x40, 0xe0,
 	0xc0, 0x20, 0x40, 0x80, 0xe0,
@@ -283,10 +305,10 @@ for(int i=0;i&lt;80;i++) {
 					<section>
 						<h2>Carga de archivos</h2>
 						
-						<p>Para cargar las ROMs, debemos abrir un archivo en modo binario y leer cada byte en la memoria desde la posición 0x200.</p>
-						<p>Podemos intentar leer el tamaño completo, siempre que no falle si se acaba antes.</p>
+						<p class="fragment">Para cargar las ROMs, debemos abrir un archivo en modo binario y copiar cada byte a la memoria, desde la posición 0x200</p>
+						<p class="fragment">Podemos intentar leer el tamaño completo, asumiendo que no falla si se acaba antes</p>
 
-						<pre><code class="language-c">FILE *input = fopen("game.ch8", "rb");
+						<pre class="fragment"><code class="language-c">FILE *input = fopen("game.ch8", "rb");
 fread(&memory[0x200], 0xE00, 1, input);
 fclose(input);</code></pre>
 					</section>
@@ -296,12 +318,12 @@ fclose(input);</code></pre>
 					<section>
 						<h2>avanzarEmulacion</h2>
 
-						<p>Es el core de la emulación, se puede dividir en 3 partes:</p>
+						<p class="fragment">Es el core de la emulación, se puede dividir en 3 partes:</p>
 
 						<ul>
-							<li><strong>Fetch:</strong> lee el "código de operación"/opcode desde la memoria</li>
-							<li><strong>Decode:</strong> decide qué operación realizar en función del opcode</li>
-							<li><strong>Execute:</strong> ejecuta dicha operación</li>
+							<li class="fragment"><strong>Fetch:</strong> lee el "código de operación"/opcode desde la memoria</li>
+							<li class="fragment"><strong>Decode:</strong> decide qué operación realizar en función del opcode</li>
+							<li class="fragment"><strong>Execute:</strong> ejecuta dicha operación</li>
 						</ul>
 
 					</section>
@@ -309,103 +331,103 @@ fclose(input);</code></pre>
 					<section>
 						<h2>Fetch</h2>
 
-						<p>Cada opcode indica qué instrucción se deberá realizar. En CHIP-8 son todos de 2 bytes, big endian:</p>
+						<p class="fragment">Lee la instrucción a ejecutar desde la memoria. Cada opcode indica qué instrucción se deberá realizar.</p>
+						<p class="fragment">En CHIP-8 son todos de 2 bytes, big endian:</p>
 
-						<pre><code class="language-c">uint16_t opcode = (memory[pc]&lt;&lt;8) | memory[pc+1];
+						<pre class="fragment"><code class="language-c">uint16_t opcode = (memory[pc]&lt;&lt;8) | memory[pc+1];
 pc += 2;</code></pre>
 					</section>
 
 					<section>
 						<h2>Decode</h2>
 
-						<p>Tenemos instrucciones con distintos operandos de distintos largos, por ejemplo:
+						<p class="fragment">El primer nibble (medio byte) define el tipo general de instrucción. Hay varios subtipos con operandos de distintos largos, por ejemplo:
 							<ul>
-								<li>0x2<em>NNN</em> con NNN es un número de 12 bits</li>
-								<li>0x6<em>XNN</em> con X un número de 4 bits, NN un número de 8 bits</li>
-								<li>0xD<em>XYN</em> con X, Y, N números de 4 bits</li>
+								<li class="fragment">0x2<em>NNN</em> con NNN es un número de 12 bits</li>
+								<li class="fragment">0x6<em>XNN</em> con X un número de 4 bits, NN un número de 8 bits</li>
+								<li class="fragment">0xD<em>XYN</em> con X, Y, N números de 4 bits</li>
 							</ul>
 						</p>
 
-						<pre><code class="language-c">uint8_t opcode1 = opcode >> 12;
-uint8_t opcode2 = (opcode >> 8) & 0xF;
-uint8_t opcode3 = (opcode >> 4) & 0xF;
-uint8_t opcode4 = opcode & 0xF;
+						<pre class="fragment"><code class="language-c">uint8_t nibble1 = opcode >> 12;
+uint8_t nibble2 = (opcode >> 8) & 0xF;
+uint8_t nibble3 = (opcode >> 4) & 0xF;
+uint8_t nibble4 = opcode & 0xF;
 
-unsigned short address = opcode & 0xFFF;
+uint16_t address = opcode & 0xFFF;
 
-unsigned char byte1 = (opcode >> 8) & 0xFF;
-unsigned char byte2 = opcode & 0xFF;
+uint8_t byte2 = opcode & 0xFF;
 </code></pre>
 					</section>
 
 					<section>
-						<h2>Execute</h2>
+						<h2>Execute (1)</h2>
 						<ul>
-						<li><code>00E0</code>: borra la pantalla</li>
-						<li><code>00EE</code>: vuelve de una subrutina: <code>pc = pop(); pc = stack[--stackPointer]</code></li>
-						<li><code>0NNN</code>: ignorar, eran llamadas a funciones de la COSMAC</li>
-						<li><code>1NNN</code>: jmp NNN: <code>pc = NNN;</code></li>
-						<li><code>2NNN</code>: call NNN: <code>push(pc); pc = NNN;</code>. El push: <code>stack[stackPointer++] = pc;</code></li>
-						<li><code>3XNN</code>: Saltea la próxima si VX es igual a NN <code>if(Vx == NN) pc += 2;</code></li>
-						<li><code>4XNN</code>: Saltea la próxima si VX no es igual a NN <code>if(Vx != NN) pc += 2;</code></li>
+						<li class="fragment"><code>00E0</code>: borra la pantalla</li>
+						<li class="fragment"><code>00EE</code>: vuelve de una subrutina: <code>pc = pop()</code></li>
+						<li class="fragment"><code>0NNN</code>: eran llamadas a funciones de la COSMAC, ignorar</li>
+						<li class="fragment"><code>1NNN</code>: salta a la posición NNN: <code>pc = NNN;</code></li>
+						<li class="fragment"><code>2NNN</code>: llama a la subrutina en NNN: <code>push(pc); pc = NNN;</code></li>
+						<li class="fragment"><code>3XNN</code>: saltea si VX es igual a NN: <code>if(Vx == NN) pc += 2;</code></li>
+						<li class="fragment"><code>4XNN</code>: saltea si VX no es igual a NN: <code>if(Vx != NN) pc += 2;</code></li>
 						</ul>
 					</section>
 
 					<section>
-						<h2>Execute</h2>
+						<h2>Execute (2)</h2>
 						<ul>
-						<li><code>5XY0</code>: Saltea la próxima si VX es igual a VY: <code>if(Vx == Vy) pc += 2;</code></li>
-						<li><code>6XNN</code>: VX = NN</li>
-						<li><code>7XNN</code>: VX += NN (el carry no afecta VF)</li>
-						<li><code>8XY0</code>: VX = VY </li>
-						<li><code>8XY1</code>: VX = VX | VY</li>
-						<li><code>8XY2</code>: VX = VX & VY</li>
-						<li><code>8XY3</code>: VX = VX ^ VY</li>
+						<li class="fragment"><code>5XY0</code>: saltea si VX es igual a VY: <code>if(Vx == Vy) pc += 2;</code></li>
+						<li class="fragment"><code>6XNN</code>: VX = NN</li>
+						<li class="fragment"><code>7XNN</code>: VX = VX + NN (el carry no afecta VF)</li>
+						<li class="fragment"><code>8XY0</code>: VX = VY </li>
+						<li class="fragment"><code>8XY1</code>: VX = VX | VY</li>
+						<li class="fragment"><code>8XY2</code>: VX = VX & VY</li>
+						<li class="fragment"><code>8XY3</code>: VX = VX ^ VY</li>
 						</ul>
 					</section>
 
 					<section>
-						<h2>Execute</h2>
+						<h2>Execute (3)</h2>
 						<ul>
-						<li><code>8XY4</code>: Vx = Vx + Vy; VF = 1 si hubo carry <code>V[x]+V[y]>0xFF</code></li>
-						<li><code>8XY5</code>: Vx = Vx - Vy; VF = 1 si hubo borrow <code>v[0xF] = 1 if(V[x] >= V[y]) else 0;</code></li>
-						<li><code>8XY6</code>: Vx = Vx >> 1; Vf es el bit que era el más bajo antes de la operación <code>Vx & 1</code></li>
-						<li><code>8XY7</code>: Vx = Vy - Vx; VF = 1 si hubo borrow <code>v[0xF] = 1 if(V[y] >= V[x]) else 0;</code></li>
-						<li><code>8XYE</code>: Vx = Vx << 1; Vf es el bit que era el más alto antes de la operación <code>Vx >> 7</code></li>
-						<li><code>9XY0</code>: Saltea la próxima si VX no es igual a VY <code>if(Vx != Vy) pc += 2;</code></li>
-						<li><code>ANNN</code>: address = NNN</li>
+						<li class="fragment"><code>8XY4</code>: Vx = Vx + Vy; VF es 0 o 1 si hubo carry <br><code class="fragment">(V[x]+V[y]>0xFF)</code></li>
+						<li class="fragment"><code>8XY5</code>: Vx = Vx - Vy; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[x] >= V[y])</code></li>
+						<li class="fragment"><code>8XY6</code>: Vx = Vx >> 1; Vf es el bit que era el más bajo antes de la operación <code class="fragment">(V[x] & 1)</code></li>
+						<li class="fragment"><code>8XY7</code>: Vx = Vy - Vx; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[y] >= V[x])</code></li>
+						<li class="fragment"><code>8XYE</code>: Vx = Vx << 1; Vf es el bit que era el más alto antes de la operación <code class="fragment">(Vx >> 7)</code></li>
+						<li class="fragment"><code>9XY0</code>: Saltea la próxima si VX no es igual a VY <code>if(Vx != Vy) pc += 2;</code></li>
+						<li class="fragment"><code>ANNN</code>: index = NNN</li>
 						</ul>
 					</section>
 
 					<section>
-						<h2>Execute</h2>
+						<h2>Execute (4)</h2>
 						<ul>
-						<li><code>BNNN</code>: pc = V0 + NNN</li>
-						<li><code>CXNN</code>: Vx = rand(0,256) & NN</li>
-						<li><code>EX9E</code>: Saltea la próxima si la tecla Vx está apretada <code>if(isDown(Vx)) pc += 2</code></li>
-						<li><code>EXA1</code>: Saltea la próxima si la tecla Vx no está apretada <code>if(!isDown(Vx)) pc += 2</code></li>
-						<li><code>FX07</code>: Vx = delayTimer;</li>
-						<li><code>FX0A</code>: <code>if(ningunaTecla) pc -= 2; else Vx = teclaPresionada;</code></li>
+						<li class="fragment"><code>BNNN</code>: salto con offset: pc = V0 + NNN</li>
+						<li class="fragment"><code>CXNN</code>: Vx = rand(0,256) & NN</li>
+						<li class="fragment"><code>EX9E</code>: Saltea si la tecla Vx está apretada <br><code class="fragment">if(isDown(Vx)) pc += 2</code></li>
+						<li class="fragment"><code>EXA1</code>: Saltea si la tecla Vx no está apretada <br><code class="fragment">if(!isDown(Vx)) pc += 2</code></li>
+						<li class="fragment"><code>FX07</code>: Vx = delayTimer</li>
+						<li class="fragment"><code>FX0A</code>: Espera a que se presione una tecla <br><code class="fragment">if(ningunaTecla) pc -= 2; else Vx = teclaPresionada;</code></li>
 						</ul>
 						</section>
 
 					<section>
-						<h2>Execute</h2>
+						<h2>Execute (5)</h2>
 						<ul>
-						<li><code>DXYN</code>: draw(Vx, Vy, N), dibuja un sprite en la posición Vx, Vy, 8 píxeles de ancho y N de alto. 
+						<li class="fragment"><code>DXYN</code>: draw(Vx, Vy, N), dibuja un sprite en la posición Vx, Vy, 8 píxeles de ancho y N de alto. 
 							Cada fila de 8 pixeles se lee a partir de la posición I.</li>
-						<li>No cambia el valor de I pero sí el de VF, se settea a 1 si se apaga algún pixel, si no 0</li>
+						<li class="fragment">No cambia el valor de I pero sí el de VF, se settea a 1 si se apaga algún pixel, si no 0</li>
 						</ul>
-							<pre><code class="language-c">V[0xF] = 0;
+							<pre class="fragment"><code class="language-c">V[0xF] = 0;
 for (int y=0;y&lt;N;y++) {
-	uint8_t actual = memory[address+y];
-	for (int x=0;x&lt;7;x++) {				
+	uint8_t actual = memory[index+y];
+	for (int x=0;x&lt;8;x++) {				
 		if ((actual&(0x80)) != 0 && x+V[X]&lt;64 && y+V[Y]&lt;32) {
-			if (getPixel(screen,x+V[X],y+V[Y])) {
-				putPixel(screen,x+V[X],y+V[Y],0);
+			if (getPixel(x+V[X],y+V[Y])) {
+				setPixel(x+V[X],y+V[Y],0);
 				V[0xF] = 1;
 			} else {
-				putPixel(screen,x+V[X],y+V[Y],0xFFFFFF);	
+				setPixel(x+V[X],y+V[Y],0xFFFFFF);	
 			}
 		}
 		actual <<= 1;
@@ -415,30 +437,34 @@ for (int y=0;y&lt;N;y++) {
 					</section>
 
 					<section>
+						<h2>Execute (6)</h2>
 						<ul>
-						<h2>Execute</h2>
-						<li><code>FX15</code>: delayTimer = Vx;</li>
-						<li><code>FX18</code>: soundTimer = Vx;</li>
-						<li><code>FX1E</code>: address = address + Vx (el carry no afecta VF)</li>
-						<li><code>FX29</code>: address = font[Vx] (dirección donde guardamos la fuente de 4x5) <code>address = Vx * 0x5;</code></li>
-						<li><code>FX33</code>: <code>memory[address] = Vx/100; memory[address+1] = (Vx/10)%10; memory[address+2] = Vx%10;</code> convierte a BCD extrayendo cada dígito a un byte</li>
-						<li><code>FX55</code>: <code>for(i=0;i<=x;i++) memory[i+I] = Vi;</code></li>
-						<li><code>FX65</code>: <code>for(i=0;i<=x;i++) Vi = memory[i+I];</code></li>
+						<li class="fragment"><code>FX15</code>: delayTimer = Vx;</li>
+						<li class="fragment"><code>FX18</code>: soundTimer = Vx;</li>
+						<li class="fragment"><code>FX1E</code>: index = index + Vx (el carry no afecta VF)</li>
+						<li class="fragment"><code>FX29</code>: index = font[Vx] : <code class="fragment">index = Vx * 5;</code></li>
+						<li class="fragment"><code>FX33</code>: convierte a BCD extrayendo cada dígito a un byte de la memoria:<span class="fragment"><pre><code>memory[index] = Vx/100;
+memory[index+1] = (Vx/10)%10;
+memory[index+2] = Vx%10;</code></pre>
+						</span>
+					</li>
+						<li class="fragment"><code>FX55</code>: escritura <code class="fragment">for(int i=0;i<=x;i++) memory[index+i] = Vi;</code></li>
+						<li class="fragment"><code>FX65</code>: lectura <code class="fragment">for(int i=0;i<=x;i++) Vi = memory[index+i];</code></li>
 						</ul>
 					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2>ROMs</h2>
+						<h2><em>That's all she wrote</em></h2>
 						
-						<p>Hay muchos juegos y ROMs que ayudan a ver si están funcionando bien los opcodes:</p>
+						<p class="fragment">Hay muchos juegos y ROMs que ayudan a ver si están funcionando bien los opcodes:</p>
 
 						<ul>
-						<li><a href="https://github.com/corax89/chip8-test-rom">chip8-test-rom</a></li>
-						<li><strong><a href="https://github.com/Timendus/chip8-test-suite">chip8-test-suite</a></strong></li>
-						<li><a href="https://johnearnest.github.io/chip8Archive/">Juegos cc0 modernos</a></li>
-						<li><a href="https://github.com/kripod/chip8-roms">ROMs varias (juegos, demos)</a></li>
+						<li class="fragment"><a href="https://github.com/corax89/chip8-test-rom">chip8-test-rom</a></li>
+						<li class="fragment"><strong><a href="https://github.com/Timendus/chip8-test-suite">chip8-test-suite</a></strong></li>
+						<li class="fragment"><a href="https://johnearnest.github.io/chip8Archive/">Juegos cc0 modernos</a></li>
+						<li class="fragment"><a href="https://github.com/kripod/chip8-roms">ROMs varias (juegos, demos)</a></li>
 						</ul>
 					</section>
 
@@ -446,14 +472,14 @@ for (int y=0;y&lt;N;y++) {
 						<h2>Pasos próximos</h2>
 						
 						<ul>
-							<li>Sonidos, mejorar timings</li>
-							<li>Disassembler: sacar loop, solo decodificar e imprimir</li>
-							<li><a href="https://chip-8.github.io/extensions/#mega-chip">Muchas extensiones: HI-RES (64x128), SCHIP (128x64), MegaChip (colores)</a></li>
-							<li><a href="https://rylev.github.io/DMG-01/public/book/">GameBoy</a> (Z80)</li>
-							<li><a href="https://yizhang82.dev/nes-emu-overview">NES</a> (6502)</li>
-							<li>Arcade: <a href="https://computerarcheology.com/Arcade/SpaceInvaders/Hardware.html">Space Invaders</a> (8080, manejo de interrupciones!), <a href="https://simonowen.com/articles/pacemu/">Pac-Man</a> (Z80)</li>
-							<li>Micro PIC (35 instrucciones), 8052 (CISC pero varios periféricos)</li>
-							<li><a href="https://github.com/marcosatti/Dynarec_Guide">Dynarec</a></li>
+							<li class="fragment">Sonidos, mejorar timings, <a href="https://github.com/Diesel-Net/kiwi-8/issues/9">quirks</a></li>
+							<li class="fragment">Disassembler: sacar loop, solo decodificar e imprimir</li>
+							<li class="fragment"><a href="https://chip-8.github.io/extensions/#mega-chip">Muchas extensiones: HI-RES (64x128), SCHIP (128x64), MegaChip (colores)</a></li>
+							<li class="fragment"><a href="https://rylev.github.io/DMG-01/public/book/">GameBoy</a> (Z80)</li>
+							<li class="fragment"><a href="https://yizhang82.dev/nes-emu-overview">NES</a> (6502)</li>
+							<li class="fragment">Arcade: <a href="https://computerarcheology.com/Arcade/SpaceInvaders/Hardware.html">Space Invaders</a> (8080, manejo de interrupciones!), <a href="https://simonowen.com/articles/pacemu/">Pac-Man</a> (Z80)</li>
+							<li class="fragment">Micro PIC (35 instrucciones), 8052 (CISC pero varios periféricos)</li>
+							<li class="fragment"><a href="https://github.com/marcosatti/Dynarec_Guide">Dynarec</a></li>
 						</ul>
 					</section>
 				</section>
