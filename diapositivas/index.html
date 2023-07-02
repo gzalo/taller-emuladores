@@ -318,6 +318,15 @@ fclose(input);</code></pre>
 					<section>
 						<h2>avanzarEmulacion</h2>
 
+						<pre><code>
+00E0		CLS
+6042		LD V0, 0x42
+6100		LD V1, 0x00
+A300 		LD I, 0x300
+D015		DRW V0, V1, 5
+1200		JP 0x200
+						</code></pre>
+
 						<p class="fragment">Es el core de la emulación, se puede dividir en 3 partes:</p>
 
 						<ul>
@@ -332,7 +341,7 @@ fclose(input);</code></pre>
 						<h2>Fetch</h2>
 
 						<p class="fragment">Lee la instrucción a ejecutar desde la memoria. Cada opcode indica qué instrucción se deberá realizar.</p>
-						<p class="fragment">En CHIP-8 son todos de 2 bytes, big endian:</p>
+						<p class="fragment">En CHIP-8 son todos son de 2 bytes, big endian:</p>
 
 						<pre class="fragment"><code class="language-c">uint16_t opcode = (memory[pc]&lt;&lt;8) | memory[pc+1];
 pc += 2;</code></pre>
@@ -363,62 +372,65 @@ uint8_t byte2 = opcode & 0xFF;
 					<section>
 						<h2>Execute (1)</h2>
 						<ul>
-						<li class="fragment"><code>00E0</code>: borra la pantalla</li>
-						<li class="fragment"><code>00EE</code>: vuelve de una subrutina: <code>pc = pop()</code></li>
-						<li class="fragment"><code>0NNN</code>: eran llamadas a funciones de la COSMAC, ignorar</li>
-						<li class="fragment"><code>1NNN</code>: salta a la posición NNN: <code>pc = NNN;</code></li>
-						<li class="fragment"><code>2NNN</code>: llama a la subrutina en NNN: <code>push(pc); pc = NNN;</code></li>
-						<li class="fragment"><code>3XNN</code>: saltea si VX es igual a NN: <code>if(Vx == NN) pc += 2;</code></li>
-						<li class="fragment"><code>4XNN</code>: saltea si VX no es igual a NN: <code>if(Vx != NN) pc += 2;</code></li>
+						<li class="fragment"><code>00E0</code><br> borra la pantalla</li>
+						<li class="fragment"><code>00EE</code><br> vuelve de una subrutina: <code class="fragment">pc = pop()</code></li>
+						<li class="fragment"><code>0NNN</code><br> eran llamadas a funciones de la COSMAC, se pueden ignorar</li>
+						<li class="fragment"><code>1NNN</code><br> salta a la posición NNN: <code class="fragment">pc = NNN;</code></li>
+						<li class="fragment"><code>2NNN</code><br> llama a la subrutina en NNN: <code class="fragment">push(pc); pc = NNN;</code></li>
 						</ul>
 					</section>
 
 					<section>
 						<h2>Execute (2)</h2>
 						<ul>
-						<li class="fragment"><code>5XY0</code>: saltea si VX es igual a VY: <code>if(Vx == Vy) pc += 2;</code></li>
-						<li class="fragment"><code>6XNN</code>: VX = NN</li>
-						<li class="fragment"><code>7XNN</code>: VX = VX + NN (el carry no afecta VF)</li>
-						<li class="fragment"><code>8XY0</code>: VX = VY </li>
-						<li class="fragment"><code>8XY1</code>: VX = VX | VY</li>
-						<li class="fragment"><code>8XY2</code>: VX = VX & VY</li>
-						<li class="fragment"><code>8XY3</code>: VX = VX ^ VY</li>
-						</ul>
-					</section>
-
-					<section>
-						<h2>Execute (3)</h2>
-						<ul>
-						<li class="fragment"><code>8XY4</code>: Vx = Vx + Vy; VF es 0 o 1 si hubo carry <br><code class="fragment">(V[x]+V[y]>0xFF)</code></li>
-						<li class="fragment"><code>8XY5</code>: Vx = Vx - Vy; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[x] >= V[y])</code></li>
-						<li class="fragment"><code>8XY6</code>: Vx = Vx >> 1; Vf es el bit que era el más bajo antes de la operación <code class="fragment">(V[x] & 1)</code></li>
-						<li class="fragment"><code>8XY7</code>: Vx = Vy - Vx; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[y] >= V[x])</code></li>
-						<li class="fragment"><code>8XYE</code>: Vx = Vx << 1; Vf es el bit que era el más alto antes de la operación <code class="fragment">(Vx >> 7)</code></li>
-						<li class="fragment"><code>9XY0</code>: Saltea la próxima si VX no es igual a VY <code>if(Vx != Vy) pc += 2;</code></li>
-						<li class="fragment"><code>ANNN</code>: index = NNN</li>
-						</ul>
-					</section>
-
-					<section>
-						<h2>Execute (4)</h2>
-						<ul>
-						<li class="fragment"><code>BNNN</code>: salto con offset: pc = V0 + NNN</li>
-						<li class="fragment"><code>CXNN</code>: Vx = rand(0,256) & NN</li>
-						<li class="fragment"><code>EX9E</code>: Saltea si la tecla Vx está apretada <br><code class="fragment">if(isDown(Vx)) pc += 2</code></li>
-						<li class="fragment"><code>EXA1</code>: Saltea si la tecla Vx no está apretada <br><code class="fragment">if(!isDown(Vx)) pc += 2</code></li>
-						<li class="fragment"><code>FX07</code>: Vx = delayTimer</li>
-						<li class="fragment"><code>FX0A</code>: Espera a que se presione una tecla <br><code class="fragment">if(ningunaTecla) pc -= 2; else Vx = teclaPresionada;</code></li>
+						<li class="fragment"><code>3XNN</code><br> saltea si VX es igual a NN: <code class="fragment">if(Vx == NN) pc += 2;</code></li>
+						<li class="fragment"><code>4XNN</code><br> saltea si VX no es igual a NN: <code class="fragment">if(Vx != NN) pc += 2;</code></li>
+						<li class="fragment"><code>5XY0</code><br> saltea si VX es igual a VY: <code class="fragment">if(Vx == Vy) pc += 2;</code></li>
+						<li class="fragment"><code>6XNN</code><br> VX = NN</li>
+						<li class="fragment"><code>7XNN</code><br> VX = VX + NN (el carry no afecta VF)</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Execute (3)</h2>
+					<ul>
+						<li class="fragment"><code>8XY0</code><br> VX = VY </li>
+						<li class="fragment"><code>8XY1</code><br> VX = VX | VY</li>
+						<li class="fragment"><code>8XY2</code><br> VX = VX & VY</li>
+						<li class="fragment"><code>8XY3</code><br> VX = VX ^ VY</li>
+						<li class="fragment"><code>8XY4</code><br> Vx = Vx + Vy; VF es 0 o 1 si hubo carry <br><code class="fragment">(V[x]+V[y]>0xFF)</code></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Execute (4)</h2>
+					<ul>	
+						<li class="fragment"><code>8XY5</code><br> Vx = Vx - Vy; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[x] >= V[y])</code></li>
+						<li class="fragment"><code>8XY6</code><br> Vx = Vx >> 1; Vf es el bit que era el más bajo antes de la operación <code class="fragment">(V[x] & 1)</code></li>
+						<li class="fragment"><code>8XY7</code><br> Vx = Vy - Vx; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[y] >= V[x])</code></li>
+						<li class="fragment"><code>8XYE</code><br> Vx = Vx << 1; Vf es el bit que era el más alto antes de la operación <code class="fragment">(Vx >> 7)</code></li>
+						<li class="fragment"><code>9XY0</code><br> Saltea la próxima si VX != VY: <code class="fragment">if(Vx != Vy) pc += 2;</code></li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Execute (5)</h2>
+					<ul>
+						<li class="fragment"><code>ANNN</code><br> index = NNN</li>
+						<li class="fragment"><code>BNNN</code><br> salto con offset: pc = V0 + NNN</li>
+						<li class="fragment"><code>CXNN</code><br> Vx = rand(0,256) & NN</li>
+						<li class="fragment"><code>EX9E</code><br> Saltea si la tecla Vx está apretada <br><code class="fragment">if(isDown(Vx)) pc += 2</code></li>
+						<li class="fragment"><code>EXA1</code><br> Saltea si la tecla Vx no está apretada <br><code class="fragment">if(!isDown(Vx)) pc += 2</code></li>
 						</ul>
 						</section>
 
 					<section>
-						<h2>Execute (5)</h2>
+						<h2>Execute (6)</h2>
 						<ul>
-						<li class="fragment"><code>DXYN</code>: draw(Vx, Vy, N), dibuja un sprite en la posición Vx, Vy, 8 píxeles de ancho y N de alto. 
+						<li class="fragment"><code>DXYN</code><br> <code>draw(Vx, Vy, N)</code> dibuja un sprite en la posición Vx, Vy, 8 píxeles de ancho y N de alto. 
 							Cada fila de 8 pixeles se lee a partir de la posición I.</li>
 						<li class="fragment">No cambia el valor de I pero sí el de VF, se settea a 1 si se apaga algún pixel, si no 0</li>
-						</ul>
-							<pre class="fragment"><code class="language-c">V[0xF] = 0;
+						<li class="fragment">
+							<pre><code class="language-c">V[0xF] = 0;
 for (int y=0;y&lt;N;y++) {
 	uint8_t actual = memory[index+y];
 	for (int x=0;x&lt;8;x++) {				
@@ -434,29 +446,40 @@ for (int y=0;y&lt;N;y++) {
 	}
 }
 						</code></pre>
+					</li>
+					</ul>
+
 					</section>
 
 					<section>
-						<h2>Execute (6)</h2>
+						<h2>Execute (7)</h2>
 						<ul>
-						<li class="fragment"><code>FX15</code>: delayTimer = Vx;</li>
-						<li class="fragment"><code>FX18</code>: soundTimer = Vx;</li>
-						<li class="fragment"><code>FX1E</code>: index = index + Vx (el carry no afecta VF)</li>
-						<li class="fragment"><code>FX29</code>: index = font[Vx] : <code class="fragment">index = Vx * 5;</code></li>
-						<li class="fragment"><code>FX33</code>: convierte a BCD extrayendo cada dígito a un byte de la memoria:<span class="fragment"><pre><code>memory[index] = Vx/100;
+						<li class="fragment"><code>FX07</code><br> Vx = delayTimer</li>
+						<li class="fragment"><code>FX0A</code><br> Espera a que se presione una tecla <br><code class="fragment">if(ningunaTecla) pc -= 2; else Vx = teclaPresionada;</code></li>
+						<li class="fragment"><code>FX15</code><br> delayTimer = Vx;</li>
+						<li class="fragment"><code>FX18</code><br> soundTimer = Vx;</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Execute (8)</h2>
+						<ul>
+						<li class="fragment"><code>FX1E</code><br> index = index + Vx (el carry no afecta VF)</li>
+						<li class="fragment"><code>FX29</code><br> index = font[Vx] : <code class="fragment">index = Vx * 5;</code></li>
+						<li class="fragment"><code>FX33</code><br> convierte a BCD (cada dígito en un byte de la memoria):<span class="fragment"><pre><code>memory[index] = Vx/100;
 memory[index+1] = (Vx/10)%10;
 memory[index+2] = Vx%10;</code></pre>
 						</span>
 					</li>
-						<li class="fragment"><code>FX55</code>: escritura <code class="fragment">for(int i=0;i<=x;i++) memory[index+i] = Vi;</code></li>
-						<li class="fragment"><code>FX65</code>: lectura <code class="fragment">for(int i=0;i<=x;i++) Vi = memory[index+i];</code></li>
+						<li class="fragment"><code>FX55</code><br> escritura <code class="fragment">for(i=0;i<=x;i++) memory[index+i] = Vi;</code></li>
+						<li class="fragment"><code>FX65</code><br> lectura <code class="fragment">for(i=0;i<=x;i++) Vi = memory[index+i];</code></li>
 						</ul>
 					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2><em>That's all she wrote</em></h2>
+						<h2><em>Eso es todo!</em></h2>
 						
 						<p class="fragment">Hay muchos juegos y ROMs que ayudan a ver si están funcionando bien los opcodes:</p>
 
