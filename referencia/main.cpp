@@ -193,7 +193,7 @@ int main(int argc, char **args){
     SDL_Texture *texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, 64, 32);
     for(int i=0;i<80;i++) memory[i] = font[i];
 
-    FILE *input = fopen("3-corax+.ch8", "rb");
+    FILE *input = fopen("test.ch8", "rb");
     fread(&memory[0x200], 0xE00, 1, input);
     fclose(input);
 
