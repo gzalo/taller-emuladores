@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller de emuladores</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.1.6/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
+    <style>
+        a {
+            color: #00F !important;
+            text-decoration: underline !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero min-h-screen bg-base-200">
+        <div class="hero-content ">
+            <div class="max-w-2xl">
+                <h2 class="text-4xl font-bold">Taller de emuladores</h2>
+                <p class="py-6 text-2xl"><strong>¡Gracias por anotarte en el taller!</strong><br> Antes de venir estaría bueno tener andando un ejemplo básico de aplicaciones gráficas en el lenguaje que elegiste, que por lo menos incluya:</p>
+
+                <ul class="list-disc list-inside">
+                    <li>Crear una ventana</li>
+                    <li>Manejar eventos (detectar cuando se presionan y sueltan las teclas, mouse no hace falta)</li>
+                    <li>Dibujar píxeles en pantalla (tener una función setPixel y si se puede getPixel también)</li>
+                </ul>
+
+                <p class="pt-2">Acá hay algunos recursos que podés ir investigando para realizarlo: (Cualquier duda escribime por <a href="https://t.me/gzaloprgm" class="link">Telegram</a>)</p>
+
+                <h3 class="text-3xl font-bold mt-3">C/C++</h3>
+                <ul class="list-disc list-inside">
+                <li><a href="https://www.libsdl.org/">SDL2</a>: voy a usar esta biblioteca para el taller, puedo enviar un ejemplo básico</li>
+                <li>Si preferís compilarlo old-school para x86 de 16 bits con TurboC, podés usar el modo 13h y escribir directo en la memoria de video (0xA0000) y leer del teclado usando el <a href="http://www.fysnet.net/kbuffio.htm">BIOS keyboard buffer</a></li>
+                <li>Alternativa: <a href="https://github.com/npiegdon/immediate2d">Immediate2d</a>: una biblioteca de gráficos tiny, solo Windows</li>
+                <li>Alternativa: <a href="https://github.com/emoon/minifb">Minifb</a>: una biblioteca tiny pero multiplatforma</li>
+                </ul>
+
+                <h3 class="text-3xl font-bold mt-3">VB6</h3>
+                <p>Casi que está todo resuelto acá, se pueden usar los eventos KeyDown/KeyUp. Para leer y dibujar píxels se puede agregar un Picturebox en un form.</p>
+
+                <h3 class="text-3xl font-bold mt-3">Rust</h3>
+                <ul class="list-disc list-inside">
+                <li>Recomendado el <a href="https://github.com/Rust-SDL2/rust-sdl2">binding de SDL2</a> (voy a usar la versión de C de esa biblioteca para el taller)</li>
+                <li>Alternativa: <a href="https://github.com/emoon/rust_minifb">Rust_Minifb</a>, una biblioteca más liviana que SDL</li>
+                </ul>
+
+                <h3 class="text-3xl font-bold mt-3">Python</h3>
+                <p><a href="https://www.pygame.org/news">Pygame</a> es la biblioteca típica para este estilo de aplicaciones, soporta <tt>set_at</tt> en una superficie o un PixelArray para manipular píxeles</p>
+
+                <h3 class="text-3xl font-bold mt-3">MicroPython</h3>
+                <p>Para leer desde las teclas se puede usar distintos pines de GPIO. Como pantalla se puede usar un mini OLED SSD1306, que está soportado nativamente vía I2C o SPI.</p>
+
+                <h3 class="text-3xl font-bold mt-3">C# u otro de .NET</h3>
+                <p>Se puede agregar un componente <a href="https://stackoverflow.com/a/39056218">WriteableBitmap</a> a un formulario, y luego con <tt>wBitmap.WritePixels(...)</tt> se pueden manipular sus píxeles. Los eventos de teclado se pueden capturar directo en el form.</p>
+                
+                <h3 class="text-3xl font-bold mt-3">JavaScript</h3>
+                <p>Lo más sencillo es usar un canvas y <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">manipular los pixeles de la imagen con un ImageData</a>. Los eventos se pueden capturar con onkeydown/onkeyup</p>
+
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
