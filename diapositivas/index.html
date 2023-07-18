@@ -114,7 +114,7 @@
 							<li class="fragment">Regiones reservadas:
 							<ul>
 								<li>Los primeros 512 bytes tenían el bootloader</li>
-								<li>Los últimos 256 bytes se usaban para variables internas</li>
+								<li>Los últimos 256 bytes se usaban para variables internas (ya no)</li>
 							</ul></li>
 							<pre class="fragment"><code class="language-c">uint8_t memory[0x1000];</code></pre></li>
 						</ul>
@@ -394,6 +394,14 @@ uint8_t byte2 = opcode & 0xFF;
 					</section>
 
 					<section>
+						<h2>Execute</h2>
+
+						<p class="fragment">Básicamente un montón de <em>ifs</em> o un <em>switch-case</em> <span class="fragment">(o una <em>branch table</em>)</span></p>
+						<img src="img/opcodes.png" style="width: 50%;">
+						
+					</section>
+
+					<section>
 						<h2>Execute (1)</h2>
 						<ul>
 						<li class="fragment"><code>00E0</code> · <code>CLS</code><br> borra la pantalla</li>
@@ -407,8 +415,8 @@ uint8_t byte2 = opcode & 0xFF;
 					<section>
 						<h2>Execute (2)</h2>
 						<ul>
-						<li class="fragment"><code>3XNN</code> · <code>SE V<em>x</em>, <em>addr</em></code><br> saltea si VX es igual a NN: <code class="fragment">if(Vx == NN) pc += 2;</code></li>
-						<li class="fragment"><code>4XNN</code> · <code>SNE V<em>x</em>, <em>addr</em></code><br> saltea si VX no es igual a NN: <code class="fragment">if(Vx != NN) pc += 2;</code></li>
+						<li class="fragment"><code>3XNN</code> · <code>SE V<em>x</em>, <em>byte</em></code><br> saltea si VX es igual a NN: <code class="fragment">if(Vx == NN) pc += 2;</code></li>
+						<li class="fragment"><code>4XNN</code> · <code>SNE V<em>x</em>, <em>byte</em></code><br> saltea si VX no es igual a NN: <code class="fragment">if(Vx != NN) pc += 2;</code></li>
 						<li class="fragment"><code>5XY0</code> · <code>SE V<em>x</em>, V<em>y</em></code><br> saltea si VX es igual a VY: <code class="fragment">if(Vx == Vy) pc += 2;</code></li>
 						<li class="fragment"><code>6XNN</code> · <code>LD V<em>x</em>, <em>byte</em></code><br> VX = NN</li>
 						<li class="fragment"><code>7XNN</code> · <code>ADD V<em>x</em>, <em>byte</em></code><br> VX = VX + NN (el carry no afecta VF)</li>
