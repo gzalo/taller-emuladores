@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo</title>
+</head>
+<body>
+    <canvas id="canvas" style="border: 1px solid #000;width: 256px;height:128px;image-rendering: pixelated;"></canvas>
+
+    <script type="text/javascript">
+        function setPixel(data, x, y, r, g, b, a) {
+            const index = (x + y * data.width) * 4;
+            data.data[index+0] = r;
+            data.data[index+1] = g;
+            data.data[index+2] = b;
+            data.data[index+3] = a;
+        }
+        
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+        const width = 64;
+        const height = 32;
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const imageData = context.createImageData(width, height);
+        let keyDown = false;
+
+        document.addEventListener("keydown", onKeyDown, false);
+        document.addEventListener("keyup", onKeyUp, false);
+
+        function onKeyDown(e) {
+            if(e.keyCode==49) {
+                keyDown = true;
+            }
+        }
+
+        function onKeyUp(e) {
+            if(e.keyCode==49) {
+                keyDown = false;
+            }
+        }
+
+        function loop(){
+            if(keyDown)
+                setPixel(imageData, 10, 10, 0, 0, 0, 255);
+            else
+                setPixel(imageData, 10, 10, 255, 255, 255, 255);
+
+            context.putImageData(imageData, 0, 0);
+            requestAnimationFrame(loop);
+        }
+
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>
