@@ -20,22 +20,27 @@
         <div class="hero-content ">
             <div class="max-w-2xl">
                 <h2 class="text-4xl font-bold">Taller de emuladores</h2>
-                <p class="py-6 text-2xl"><strong>¡Gracias por anotarte!</strong><br> <strong>Acá encontrarás ejemplos en distintos lenguajes, podés elegir el que prefieras y probarlo antes del sábado para validar que tu IDE esté bien configurado.</strong><br> El ejemplo abre una ventana y dibuja un gran pixel cuando la tecla "1" está presionada.</p>
+                <p class="py-6 text-2xl"><strong>¡Gracias por anotarte!</strong><br> <strong>Acá encontrarás ejemplos en distintos lenguajes, podés elegir el que prefieras y probarlo antes del sábado para validar que tu entorno esté bien configurado.</strong><br> Prueba de funcionamiento: oprimir la tecla "1" para dibujar un pixel blanco, soltarla para dibujar un pixel negro.</p>
                 
                 <h3 class="text-3xl font-bold mt-3">C/C++</h3>
-                <p><strong><a href="ejemplos/taller.cpp">Ejemplo básico con SDL2</a><br> Compilar con <code>g++ taller.cpp -Wall -O2 -o taller -lSDL2</code>, luego correr <code>./taller</code><br>En windows agregar <code>-lmingw32 -lSDL2main</code> antes de <code>-lSDL2</code></strong></p>
+                <p><a href="ejemplos/taller.cpp">Ejemplo básico con SDL2</a><ul class="list-disc list-inside">
+
+                <li>Bajar las dependencias con <code>sudo apt install build-essential libsdl2-dev</code></li>
+                <li>Bajar el archivo cpp, compilarlo con <code>g++ taller.cpp -Wall -O2 -o taller -lSDL2</code></li>
+                <li>Correr <code>./taller</code></li>
+                </ul></p>
 
                 <h3 class="text-3xl font-bold mt-3">Rust</h3>
-                <p><strong><a href="ejemplos/src/main.rs">Ejemplo básico con rust-sdl2</a>. <a href="ejemplos/Cargo.toml">Cargo.toml</a></strong></p>
+                <p><a href="ejemplos/src/main.rs">Ejemplo básico con rust-sdl2</a>. <a href="ejemplos/Cargo.toml">Cargo.toml</a></p>
 
                 <h3 class="text-3xl font-bold mt-3">Python</h3>
-                <p><strong><a href="ejemplos/taller.py">Ejemplo básico con pygame</a><br> Correr con <code>python taller.py</code></strong></p>
+                <p><a href="ejemplos/taller.py">Ejemplo básico con pygame</a><br> Corer <code>pip install pygame</code> para instalar esa biblioteca, luego <code>python taller.py</code></p>
 
                 <h3 class="text-3xl font-bold mt-3">JavaScript</h3>
-                <p><strong><a href="ejemplos/taller.html">Ejemplo básico con canvas</a></strong></p>
+                <p><a href="ejemplos/taller.html">Ejemplo básico con canvas</a></p>
 
                 <h3 class="text-3xl font-bold mt-3">Java</h3>
-                <p><strong><a href="ejemplos/java.zip">Ejemplo básico</a></strong></p>
+                <p><a href="ejemplos/java.zip">Ejemplo básico</a></p>
 
                 <hr class="mt-2">
 
