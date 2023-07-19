@@ -32,8 +32,8 @@
 
                 <h3 class="text-3xl font-bold mt-3">C/C++</h3>
                 <ul class="list-disc list-inside">
-                <li><a href="https://www.libsdl.org/">SDL2</a>: voy a usar esta biblioteca para el taller, puedo enviar un ejemplo básico</li>
-                <li>Si preferís compilarlo old-school para x86 de 16 bits con TurboC, podés usar el modo 13h y escribir directo en la memoria de video (0xA0000) y leer del teclado usando el <a href="http://www.fysnet.net/kbuffio.htm">BIOS keyboard buffer</a></li>
+                <p><strong>Voy a usar <a href="https://www.libsdl.org/">SDL2</a> para el taller, <a href="ejemplos/taller.cpp">Ejemplo básico</a><br> Compilar con <code>g++ taller.cpp -Wall -O2 -o taller -lSDL2</code><br>En windows agregar <code>-lmingw32 -lSDL2main</code> antes de <code>-lSDL2</code></strong></p>
+                <li>Alternativa: Si preferís compilarlo old-school para x86 de 16 bits con TurboC, podés usar el modo 13h y escribir directo en la memoria de video (0xA0000) y leer del teclado usando el <a href="http://www.fysnet.net/kbuffio.htm">BIOS keyboard buffer</a></li>
                 <li>Alternativa: <a href="https://github.com/npiegdon/immediate2d">Immediate2d</a>: una biblioteca de gráficos tiny, solo Windows</li>
                 <li>Alternativa: <a href="https://github.com/emoon/minifb">Minifb</a>: una biblioteca tiny pero multiplatforma</li>
                 </ul>
