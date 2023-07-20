@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/blood.min.css" id="theme">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/base16/monokai.min.css">
 		<style>
-			.reveal h1 { font-size: 2.2em; text-transform: none; }
+			.reveal h1 { font-size: 2.2em; text-transform: none; text-shadow: none;}
 			.reveal h2 { font-size: 1.8em; text-transform: none; }
 			.reveal h3 { font-size: 1.3em; }
 			.reveal h4 { font-size: 0.8em; }
@@ -25,7 +25,7 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h1>Intro a emuladores: Desarrollo de un emulador de CHIP-8</h1>
+					<h1><small>Intro a emuladores</small><br>Desarrollo de un emulador de CHIP-8</h1>
 					<span>Gonzalo Avila · <tt>gzalo.com</tt></span>
 				</section>
 
@@ -38,6 +38,55 @@
 					<small>Licencia: Creative Commons Attribution-NonCommercial 4.0 International License</small>
 					</section>
 				</section>
+
+				<section>		
+					<section>
+						<h2>Emulación vs simulación</h2>
+						<p class="fragment">Emulador: permite <strong>ejecutar programas en una plataforma distinta</strong>, modelándola de forma precisa</p>
+						<p class="fragment">Simulador: <strong>reproduce el comportamiento</strong> del programa usando modelos matemáticos o lógicos</p>
+						<p class="fragment">Ejemplo: emulador de nokia 1100 vs simulador de nokia 1100</p>
+					</section>
+					<section>
+						<h2>Niveles de emulación</h2>
+						<p class="fragment">Hay muchas formas de emular una plataforma de hardware:
+							<ul>
+							<li class="fragment">Nivel transistor (analógico), tener en cuenta los circuitos y características físicas</li>
+							<li class="fragment">Nivel transistor (digital), asumiendo que se comportan digitalmente como llaves</li>
+							<li class="fragment">Nivel compuertas lógicas y registros (flip-flops)</li>
+							<li class="fragment"><strong>Nivel instrucciones</strong></li>
+							</ul>
+						</p>
+						<p class="fragment">Dependiendo del nivel de precisión (y performance) deseado se suele elegir una.
+						</p>
+					</section>
+
+					<section>
+						<h2>CPU</h2>
+						<ul>
+						<li class="fragment">Lee instrucciones de la memoria y las ejecuta</li>
+						<li class="fragment">El Program Counter (PC) indica de donde leer la próxima</li>
+						<li class="fragment">Una señal de <em>clock</em> sincroniza los procesos internos</li>
+						<li class="fragment">Cada instrucción puede demorar distintos ciclos de clock</li>
+						<li class="fragment">Tiene registros internos con los que puede hacer cuentas</li>
+						</ul>
+						<img src="img/cpu.png" class="fragment">
+					</section>
+
+					<section>
+						<h2>Ejemplo de programa básico</h2>
+						<pre class="fragment"><code class="language-c">uint8_t miVariable = 0x10; // Variable de 1 byte
+miVariable = miVariable + 0x08;</code></pre>
+<pre class="fragment"><code>LD V0, 0x10 ; Registro
+ADD V0, 0x08</code></pre>
+						<pre class="fragment"><code>60107008</code></pre>
+						<pre class="fragment"><code>PC=0 · V0 = xxxx
+PC=2 · V0 = 0x10
+PC=4 · V0 = 0x18</code></pre>
+						
+					</section>
+				</section>
+
+
 
 				<section>
 					<section>
