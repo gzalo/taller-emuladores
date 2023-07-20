@@ -380,6 +380,9 @@ for(int i=0;i&lt;80;i++) {
 						<pre class="fragment"><code class="language-c">FILE *input = fopen("game.ch8", "rb");
 fread(&memory[0x200], 0xE00, 1, input);
 fclose(input);</code></pre>
+						<p class="fragment">Rust: <code>File::open</code>, luego <code>read_to_end</code></p>
+						<p class="fragment">Python: <code>with open(..., "rb")</code>, luego <code>readinto</code></p>
+						<p class="fragment">Java: <code>new FileInputStream(...)</code>, luego <code>read</code></p>
 					</section>
 				</section>
 
