@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
-public class Ejemplo implements KeyListener {
+public class Taller implements KeyListener {
     private final JFrame frame;
     private final MyCanvas canvas;
     private final BufferedImage image;
@@ -12,7 +12,7 @@ public class Ejemplo implements KeyListener {
     private final int scale = 4;
     private final int width = 64;
     private final int height = 32;
-    public Ejemplo() {
+    public Taller() {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         frame = new JFrame("");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -56,7 +56,7 @@ public class Ejemplo implements KeyListener {
     }
 
     public static void main(String[] args) {
-        new Ejemplo();
+        new Taller();
     }
 
     @Override
