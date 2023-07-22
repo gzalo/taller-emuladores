@@ -384,6 +384,16 @@ fclose(input);</code></pre>
 						<p class="fragment">Python: <code>with open(..., "rb")</code>, luego <code>readinto</code></p>
 						<p class="fragment">Java: <code>new FileInputStream(...)</code>, luego <code>read</code></p>
 					</section>
+
+					<section>
+						<h2>ROMs de prueba y juegos</h2>
+						<ul>
+							<li class="fragment"><strong><a href="https://github.com/Timendus/chip8-test-suite">chip8-test-suite</a></strong></li>
+							<li class="fragment"><a href="https://johnearnest.github.io/chip8Archive/">Juegos cc0 modernos</a></li>
+							<li class="fragment"><a href="https://github.com/kripod/chip8-roms">ROMs varias (juegos, demos)</a></li>
+						</ul>
+					</section>
+
 				</section>
 
 				<section>
@@ -488,9 +498,9 @@ uint8_t byte2 = opcode & 0xFF;
 				<section>
 					<h2>Execute (4)</h2>
 					<ul>	
-						<li class="fragment"><code>8XY5</code> · <code>SUB V<em>x</em>, V<em>y</em></code><br> Vx = Vx - Vy; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[x] >= V[y])</code></li>
+						<li class="fragment"><code>8XY5</code> · <code>SUB V<em>x</em>, V<em>y</em></code><br> Vx = Vx - Vy; VF es 0 o 1 si no hubo borrow <br><code class="fragment">(V[x] >= V[y])</code></li>
 						<li class="fragment"><code>8XY6</code> · <code>SHR V<em>x</em></code><br> Vx = Vx >> 1; Vf es el bit que era el más bajo antes de la operación <code class="fragment">(V[x] & 1)</code></li>
-						<li class="fragment"><code>8XY7</code> · <code>SUBN V<em>x</em>, V<em>y</em></code><br> Vx = Vy - Vx; VF es 0 o 1 si hubo borrow <br><code class="fragment">(V[y] >= V[x])</code></li>
+						<li class="fragment"><code>8XY7</code> · <code>SUBN V<em>x</em>, V<em>y</em></code><br> Vx = Vy - Vx; VF es 0 o 1 si no hubo borrow <br><code class="fragment">(V[y] >= V[x])</code></li>
 						<li class="fragment"><code>8XYE</code> · <code>SHL V<em>x</em></code><br> Vx = Vx << 1; Vf es el bit que era el más alto antes de la operación <code class="fragment">(Vx >> 7)</code></li>
 						<li class="fragment"><code>9XY0</code> · <code>SNE V<em>x</em>, V<em>y</em></code><br> Saltea la próxima si VX != VY: <code class="fragment">if(Vx != Vy) pc += 2;</code></li>
 					</ul>
@@ -563,16 +573,10 @@ memory[index+2] = Vx%10;</code></pre>
 
 				<section>
 					<section>
-						<h2><em>Eso es todo!</em></h2>
+						<h2><em>¡Eso es todo!</em></h2>
 						
-						<p class="fragment">Hay muchos juegos y ROMs que ayudan a ver si están funcionando bien los opcodes:</p>
-
-						<ul>
-						<li class="fragment"><a href="https://github.com/corax89/chip8-test-rom">chip8-test-rom</a></li>
-						<li class="fragment"><strong><a href="https://github.com/Timendus/chip8-test-suite">chip8-test-suite</a></strong></li>
-						<li class="fragment"><a href="https://johnearnest.github.io/chip8Archive/">Juegos cc0 modernos</a></li>
-						<li class="fragment"><a href="https://github.com/kripod/chip8-roms">ROMs varias (juegos, demos)</a></li>
-						</ul>
+						<p class="fragment">Si salió todo bien, al cargar la ROM deberían ver esto:</p>
+						<img src="https://raw.githubusercontent.com/Timendus/chip8-test-suite/main/pictures/corax%2B.png" class="fragment">
 					</section>
 
 					<section>
