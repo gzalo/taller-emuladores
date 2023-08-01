@@ -21,7 +21,6 @@ const uint8_t font[80] = {
         0xe0, 0x80, 0xc0, 0x80, 0xe0,
         0xe0, 0x80, 0xc0, 0x80, 0x80
 };
-
 uint32_t screen[64*32];
 uint8_t memory[0x1000];
 uint8_t v[16];
@@ -32,18 +31,20 @@ uint8_t stackPointer = 0;
 uint8_t delayTimer = 0;
 uint8_t soundTimer = 0;
 uint8_t keys[16];
-
-void push(uint16_t valor){
-    stack[stackPointer++] = valor;
-}
-uint16_t pop(){
-    return stack[--stackPointer];
-}
-void setPixel(uint8_t x, uint8_t y, uint32_t value) {
+int8_t pressedKey = -1;
+void setPixel(int x, int y, uint32_t value) {
     screen[ y * 64 + x ] = value;
 }
-uint32_t getPixel(uint8_t x, uint8_t y) {
+uint32_t getPixel(int x, int y) {
     return screen[ y * 64 + x ];
+}
+int8_t firstKeyDown() {
+    for (int i = 0; i < 16; i++) {
+        if (keys[i]) {
+            return i;
+        }
+    }
+    return -1;
 }
 void avanzarEmulacion() {
     // Fetch
@@ -61,25 +62,19 @@ void avanzarEmulacion() {
         if(address == 0x0E0){
             for(int i=0;i<64*32;i++) screen[i] = 0;
         } else if (address == 0x0EE){
-            pc = pop();
+            pc = stack[--stackPointer];
         }
     } else if(nibble1 == 0x1) {
         pc = address;
     } else if(nibble1 == 0x2){
-        push(pc);
+        stack[stackPointer++] = pc;
         pc = address;
-    } else if(nibble1 == 0x3){
-        if(v[nibble2] == byte2){
-            pc += 2;
-        }
-    } else if(nibble1 == 0x4){
-        if(v[nibble2] != byte2){
-            pc += 2;
-        }
-    } else if(nibble1 == 0x5){
-        if(v[nibble2] == v[nibble3]){
-            pc += 2;
-        }
+    } else if(nibble1 == 0x3 && v[nibble2] == byte2){
+        pc += 2;
+    } else if(nibble1 == 0x4 && v[nibble2] != byte2){
+        pc += 2;
+    } else if(nibble1 == 0x5 && v[nibble2] == v[nibble3]){
+        pc += 2;
     } else if(nibble1 == 0x6){
         v[nibble2] = byte2;
     } else if(nibble1 == 0x7){
@@ -105,7 +100,6 @@ void avanzarEmulacion() {
             v[nibble2] -= v[nibble3];
             v[0xF] = borrow;
         } else if(nibble4 == 0x6){
-            //v[nibble2] = v[nibble3];
             int lsb = v[nibble2] & 1;
             v[nibble2] >>= 1;
             v[0xF] = lsb;
@@ -114,7 +108,6 @@ void avanzarEmulacion() {
             v[nibble2] = v[nibble3] - v[nibble2];
             v[0xF] = borrow;
         } else if(nibble4 == 0xE){
-            //v[nibble2] = v[nibble3];
             int msb = v[nibble2] >> 7;
             v[nibble2] <<= 1;
             v[0xF] = msb;
@@ -136,7 +129,7 @@ void avanzarEmulacion() {
             for (int x = 0; x < 8; x++) {
                 int rx = x + x0;
                 int ry = y + y0;
-                if ((actual & (0x80)) != 0 && rx < 64 && ry < 32) {
+                if ((actual & 0x80) != 0 && rx < 64 && ry < 32) {
                     if (getPixel(rx, ry)) {
                         setPixel(rx, ry, 0);
                         v[0xF] = 1;
@@ -148,19 +141,22 @@ void avanzarEmulacion() {
             }
         }
     } else if(nibble1 == 0xE) {
-        if(byte2 == 0x9E){
-            if(keys[v[nibble2]]) pc += 2;
-        }else if(byte2 == 0xA1){
-            if(!keys[v[nibble2]]) pc += 2;
+        if(byte2 == 0x9E && keys[v[nibble2]]){
+            pc += 2;
+        }else if(byte2 == 0xA1 && !keys[v[nibble2]]){
+            pc += 2;
         }
     } else if(nibble1 == 0xF) {
         if(byte2 == 0x07){
             v[nibble2] = delayTimer;
         }else if(byte2 == 0x0A){
-            bool ningunaTecla = true;
-            int tecla = 0;
-            for(int i=0;i<16;i++) if(keys[i]) { ningunaTecla = false; tecla = i; }
-            if(ningunaTecla) pc -= 2; else v[nibble2] = tecla;
+            int current = firstKeyDown();
+            if(pressedKey != -1 && current == -1){
+                v[nibble2] = pressedKey;
+            } else {
+                pc -= 2;
+            }
+            pressedKey = current;
         }else if(byte2 == 0x15) {
             delayTimer = v[nibble2];
         }else if(byte2 == 0x18) {
@@ -193,7 +189,7 @@ int main(int argc, char **args){
     SDL_Texture *texture = SDL_CreateTexture(renderer,SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, 64, 32);
     for(int i=0;i<80;i++) memory[i] = font[i];
 
-    FILE *input = fopen("test.ch8", "rb");
+    FILE *input = fopen("6-keypad.ch8", "rb");
     fread(&memory[0x200], 0xE00, 1, input);
     fclose(input);
 
@@ -240,7 +236,7 @@ int main(int argc, char **args){
         }
         if(delayTimer > 0) delayTimer--;
         if(soundTimer > 0) soundTimer--;
-        for(int i=0;i<8;i++) avanzarEmulacion();
+        for(int i=0;i<8;i++) avanzarEmulacion(); // Aprox 480 instrucciones por segundo
         // Dibujar pantalla
         SDL_UpdateTexture(texture, NULL, screen, 64 * sizeof(Uint32));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
